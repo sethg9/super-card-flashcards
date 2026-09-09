@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { version } from '../package.json';
 import {
   Layers,
   Plus,
@@ -695,7 +696,7 @@ export default function App() {
         <Modal label="About SuperCard" small onClose={() => setInfo(null)}>
           <div className="modal-heading">
             <h2>
-              SuperCard <span className="muted">0.1.0</span>
+              SuperCard <span className="muted">{version}</span>
             </h2>
             <button aria-label="Close about" onClick={() => setInfo(null)}>
               <X size={20} />

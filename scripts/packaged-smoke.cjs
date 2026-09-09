@@ -52,6 +52,11 @@ async function run(reopen) {
     });
     const page = context.pages()[0] || (await context.waitForEvent('page'));
     await page.waitForFunction(() => !!window.supercard);
+    await page.getByRole('button', { name: 'About & storage' }).click();
+    await page
+      .getByRole('heading', { name: `SuperCard ${require('../package.json').version}` })
+      .waitFor();
+    await page.getByRole('button', { name: 'Close about' }).click();
     assert.equal(path.resolve(await page.evaluate(() => window.supercard.dataPath())), profile);
     if (!reopen) {
       await page.evaluate(
