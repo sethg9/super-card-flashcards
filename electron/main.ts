@@ -1,18 +1,14 @@
-import {
-  app,
-  BrowserWindow,
-  ipcMain,
-  protocol,
-  session,
-  Menu,
-  nativeImage,
-  dialog,
-} from 'electron';
+import { app, BrowserWindow, ipcMain, protocol, session, Menu, dialog } from 'electron';
 import path from 'node:path';
-import { readFile } from 'node:fs/promises';
+import { readFile, stat, writeFile } from 'node:fs/promises';
+import { createReadStream } from 'node:fs';
+import { Readable } from 'node:stream';
+import { MANAGED_IMAGE } from '../shared/images';
+import { checkFileSize } from '../shared/limits';
 import { Store } from './store';
 import { MediaStore } from './media';
 import { registerFileActions } from './file-actions';
+import { checkPackagedTransfers } from './packaged-check';
 
 app.setName('SuperCard');
 app.setPath('userData', path.join(app.getPath('appData'), 'SuperCard'));
@@ -60,14 +56,28 @@ app
   .then(() => {
     if (!hasLock) return;
     store = new Store(app.getPath('userData'));
-    const media = new MediaStore(app.getPath('userData'), (bytes) => {
-      const decoded = nativeImage.createFromBuffer(Buffer.from(bytes));
-      const { width, height } = decoded.getSize();
-      if (decoded.isEmpty() || width * height > 40_000_000)
-        throw new Error('Image could not be decoded or exceeds 40 megapixels.');
-    });
+    const media = new MediaStore(app.getPath('userData'));
     registerFileActions(handle, store, media, () => window);
-    protocol.handle('supercard-media', (request) => {
+    if (
+      app.isPackaged &&
+      process.env.SUPERCARD_SMOKE_TRANSFERS === '1' &&
+      process.env.SUPERCARD_TEST_DATA &&
+      path.isAbsolute(process.env.SUPERCARD_TEST_DATA)
+    ) {
+      void checkPackagedTransfers(app.getPath('userData')).then(
+        (result) =>
+          writeFile(
+            path.join(app.getPath('userData'), 'transfer-result.json'),
+            JSON.stringify(result),
+          ),
+        (error) =>
+          writeFile(
+            path.join(app.getPath('userData'), 'transfer-result.json'),
+            JSON.stringify({ error: String(error) }),
+          ),
+      );
+    }
+    protocol.handle('supercard-media', async (request) => {
       try {
         const url = new URL(request.url);
         if (url.hostname !== 'local') throw new Error('Invalid media origin');
@@ -78,7 +88,10 @@ app
           gif: 'image/gif',
           webp: 'image/webp',
         };
-        return new Response(new Uint8Array(media.read(name)), {
+        if (!MANAGED_IMAGE.test(name)) throw new Error('Invalid managed image');
+        const file = path.join(media.dir, name);
+        checkFileSize((await stat(file)).size);
+        return new Response(Readable.toWeb(createReadStream(file)) as ReadableStream, {
           headers: {
             'Content-Type': mime[name.split('.').pop()!] || 'application/octet-stream',
             'X-Content-Type-Options': 'nosniff',

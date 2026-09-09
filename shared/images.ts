@@ -1,5 +1,5 @@
 export const MANAGED_IMAGE = /^[a-f0-9]{64}\.(png|jpg|gif|webp)$/;
-export const IMAGE_LIMIT = 20 * 1024 * 1024;
+export { FILE_LIMIT as IMAGE_LIMIT } from './limits';
 export function decodeReference(s: string) {
   return s.replace(/&(?:amp|quot|apos|lt|gt|#\d+|#x[0-9a-f]+);/gi, (entity) => {
     const named: Record<string, string> = {

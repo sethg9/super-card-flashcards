@@ -48,7 +48,7 @@ export default function StudyCard({
               inert={!active}
               tabIndex={active ? 0 : -1}
               onKeyDown={(e) => {
-                if (e.key === 'Enter') {
+                if (e.key === 'Enter' && !e.repeat && !e.defaultPrevented) {
                   e.preventDefault();
                   onFlip();
                 }
@@ -65,9 +65,6 @@ export default function StudyCard({
               >
                 <Content source={card[side]} />
               </div>
-              <span className="flip-hint">
-                Click anywhere or press <kbd>Space</kbd> to flip
-              </span>
             </div>
           );
         })}

@@ -13,7 +13,7 @@ import {
 } from '../shared/appearance';
 test('appearance migration preserves legacy themes and explicit choices, rejecting invalid settings', () => {
   assert.equal(normalizeAppearance(null, 'dark').theme, 'dark');
-  assert.equal(normalizeAppearance(null, 'dark').animateFlips, false);
+  assert.equal(normalizeAppearance(null, 'dark').animateFlips, true);
   const choice = {
     ...DEFAULT_APPEARANCE,
     theme: 'oled',
@@ -43,7 +43,7 @@ test('arbitrary accents have readable text, filled-button labels, and focus colo
       '#123456',
     ]) {
       const vars = accentVariables({ ...DEFAULT_APPEARANCE, theme, accent });
-      const surface = theme === 'light' ? '#ffffff' : theme === 'dark' ? '#1e2130' : '#000000';
+      const surface = vars['--surface'];
       for (const fill of ['--accent', '--accent-hover', '--accent-pressed'])
         assert.ok(contrast(vars[fill], vars['--accent-fg']) >= 4.5, `${theme}/${accent}/${fill}`);
       assert.ok(contrast(vars['--accent-text'], surface) >= 4.5);
@@ -72,4 +72,18 @@ test('settings table is additive and preferences persist without changing cards 
   assert.deepEqual(store.loadAppearance(), saved);
   assert.deepEqual(store.load(), before);
   store.close();
+});
+
+test('saved animation opt-out survives migration; dark tint follows accent and OLED stays black', () => {
+  assert.equal(normalizeAppearance({ animateFlips: false }).animateFlips, false);
+  assert.equal(normalizeAppearance({}).animateFlips, true);
+  const green = accentVariables({ ...DEFAULT_APPEARANCE, theme: 'dark', accent: '#00ff00' });
+  const red = accentVariables({ ...DEFAULT_APPEARANCE, theme: 'dark', accent: '#ff0000' });
+  for (const key of ['--bg', '--sidebar', '--surface', '--hover', '--border'])
+    assert.notEqual(green[key], red[key]);
+  for (const accent of ['#ffffff', '#000000', '#ff0000']) {
+    const oled = accentVariables({ ...DEFAULT_APPEARANCE, theme: 'oled', accent });
+    for (const key of ['--bg', '--surface', '--sidebar', '--banner'])
+      assert.equal(oled[key], '#000000');
+  }
 });

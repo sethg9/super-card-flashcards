@@ -142,6 +142,9 @@ export default function AppearanceDialog({
           )}
           <span className="background-example">Your cards stay readable</span>
         </div>
+        <p className="muted">
+          PNG, JPEG, GIF or WebP � up to 200 MB (209,715,200 bytes) and 40 megapixels.
+        </p>
         <div className="background-actions">
           <button
             disabled={busy}
@@ -159,7 +162,7 @@ export default function AppearanceDialog({
             }}
           >
             <ImagePlus size={16} />
-            {value.background ? 'Replace image' : 'Choose image'}
+            {busy ? 'Processing image�' : value.background ? 'Replace image' : 'Choose image'}
           </button>
           {value.background && (
             <button disabled={busy} onClick={() => update({ background: null })}>

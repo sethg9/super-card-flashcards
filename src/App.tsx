@@ -28,6 +28,7 @@ import ImportDialog from './ImportDialog';
 import Modal from './Modal';
 import AppearanceDialog from './AppearanceDialog';
 import StudyCard from './StudyCard';
+import { studyShortcut } from './study-shortcuts';
 import { useAppearance } from './useAppearance';
 
 const api = window.supercard;
@@ -118,30 +119,14 @@ export default function App() {
   };
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
-      if (
-        !study ||
-        e.target instanceof HTMLInputElement ||
-        e.target instanceof HTMLTextAreaElement ||
-        e.target instanceof HTMLSelectElement ||
-        document.querySelector('[role="dialog"]') ||
-        e.repeat
-      )
-        return;
-      if (e.code === 'Space') {
-        e.preventDefault();
-        setFlipped((f) => !f);
-      }
-      if (e.key === 'ArrowRight') {
-        if (e.target instanceof HTMLElement && e.target.closest('.study-scroll')) return;
-        e.preventDefault();
-        move(1);
-      }
-      if (e.key === 'ArrowLeft') {
-        if (e.target instanceof HTMLElement && e.target.closest('.study-scroll')) return;
-        e.preventDefault();
-        move(-1);
-      }
-      if (e.key === 'Escape') setStudy(null);
+      if (!study) return;
+      const action = studyShortcut(e, !!document.querySelector('[role="dialog"]'));
+      if (!action) return;
+      e.preventDefault();
+      if (action === 'flip') setFlipped((f) => !f);
+      else if (action === 'next') move(1);
+      else if (action === 'previous') move(-1);
+      else setStudy(null);
     };
     window.addEventListener('keydown', key);
     return () => window.removeEventListener('keydown', key);
@@ -218,9 +203,6 @@ export default function App() {
               <FolderOpen size={16} /> Restore backup
             </button>
           </div>
-          <div className="local-note">
-            <span className="status-dot" /> Your library, saved locally
-          </div>
           <button
             className="quiet"
             disabled={!preferences.loaded}
@@ -239,10 +221,13 @@ export default function App() {
             Library <span className="slash">/</span>{' '}
             <strong>{study ? 'Study session' : deck?.name || 'Welcome'}</strong>
           </span>
-          <span className="offline-badge">
-            <span className="status-dot" /> Offline & yours
-          </span>
         </header>
+        {busy && (
+          <div role="status" className="transfer-status">
+            Processing files�{' '}
+            <button onClick={() => api.cancelTransfer()}>Cancel preparation</button>
+          </div>
+        )}
         {(error || preferences.error || backgroundMissing) && (
           <div className="error" role="alert">
             {error ||
@@ -336,7 +321,6 @@ export default function App() {
                 <RotateCcw size={17} /> Restart
               </button>
             </div>
-            <p className="study-note">Take your time. Every card is always available.</p>
           </section>
         ) : !deck ? (
           <div className="welcome empty">
@@ -467,7 +451,7 @@ export default function App() {
                   <article className="card-row" key={c.id}>
                     <span className="card-number">{i + 1}</span>
                     <div className="card-face">
-                      <Content source={c.front} />
+                      <Content source={c.front.slice(0, 4000)} />
                       {c.tags && (
                         <div className="tags">
                           {c.tags
@@ -480,7 +464,7 @@ export default function App() {
                       )}
                     </div>
                     <div className="card-face">
-                      <Content source={c.back} />
+                      <Content source={c.back.slice(0, 4000)} />
                     </div>
                     <div className="row-actions">
                       <button
@@ -705,6 +689,17 @@ export default function App() {
           <p>
             A little practice, on your terms. Every card is available whenever you want to study.
           </p>
+          <h3>Quick guide</h3>
+          <p>
+            Click a card or press Space, Up, or Down to flip it. Left/Right arrows move between
+            cards. Page Up/Down scroll long cards. Escape returns to the deck.
+          </p>
+          <p>
+            Open Appearance in the sidebar for themes, accent colors, backgrounds, and Animate card
+            flips. Reduced motion always suppresses rotation. Study shortcuts pause while editing or
+            using a dialog.
+          </p>
+          <p>Vibecoded by ChatGPT 6 Astra - Idea from Seth</p>
           <strong>Saved on this computer</strong>
           <p className="storage-path">{info}</p>
           <p>

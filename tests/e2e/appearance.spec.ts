@@ -15,7 +15,7 @@ test('appearance, managed backgrounds, contrast extremes, flips and restart pers
   try {
     let page = await app.firstWindow();
     await page.getByRole('button', { name: 'Appearance', exact: true }).click();
-    await expect(page.getByRole('switch', { name: 'Animate card flips' })).not.toBeChecked();
+    await expect(page.getByRole('switch', { name: 'Animate card flips' })).toBeChecked();
     await expect(page.getByLabel('Accent hex color')).toHaveValue('#78f542');
     for (const theme of ['Light', 'Dark', 'OLED Black']) {
       await page.getByRole('button', { name: theme, exact: true }).click();

@@ -162,7 +162,8 @@ export default function CardEditor({
         if (files.length > 20) throw new Error('Insert at most 20 images at a time.');
         names = [];
         for (const file of files) {
-          if (file.size > IMAGE_LIMIT) throw new Error(`${file.name} exceeds 20 MB.`);
+          if (file.size > IMAGE_LIMIT)
+            throw new Error(`${file.name} exceeds 200 MB (209,715,200 bytes).`);
           names.push(await window.supercard.addImage(new Uint8Array(await file.arrayBuffer())));
         }
       } else names = await window.supercard.pickImages();

@@ -200,8 +200,12 @@ export default function ImportDialog({
         <span className="preview-label">
           PREVIEW · FIRST {Math.min(result?.cards.length || 0, 3)} CARDS
         </span>
-        <span>{result?.cards.length || 0} ready to import</span>
+        <span>{preview.totalRows - (mapping.hasHeader ? 1 : 0)} rows in file</span>
       </div>
+      <p className="import-note">
+        Preview uses the first 10 records and abbreviates long fields. All rows are validated during
+        import.
+      </p>
       <div className="import-preview">
         {result?.cards.slice(0, 3).map((card, i) => (
           <div className="import-preview-row" key={i}>
@@ -233,7 +237,7 @@ export default function ImportDialog({
           }
         >
           <Upload size={16} />
-          {busy ? 'Importing…' : `Import ${result?.cards.length || 0} cards`}
+          {busy ? 'Importing…' : 'Import cards'}
         </button>
       </div>
     </Modal>

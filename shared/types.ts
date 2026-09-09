@@ -24,6 +24,7 @@ export interface CardInput {
   tags: string;
 }
 export interface ImportPreview {
+  totalRows: number;
   token: string;
   name: string;
   parsed: import('./csv').ParsedImport;
@@ -34,6 +35,7 @@ export interface TransferReport {
   deckId?: string;
 }
 export interface SuperCardAPI {
+  cancelTransfer(): Promise<void>;
   loadAppearance(): Promise<import('./appearance').Appearance | null>;
   saveAppearance(value: import('./appearance').Appearance): Promise<void>;
   chooseBackground(): Promise<string | null>;

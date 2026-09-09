@@ -1,6 +1,6 @@
 // Exercise the packaged executable using synthetic data in an isolated profile.
 const { spawn } = require('node:child_process');
-const { mkdirSync, mkdtempSync } = require('node:fs');
+const { mkdirSync, mkdtempSync, existsSync, unlinkSync, readFileSync } = require('node:fs');
 const path = require('node:path');
 const assert = require('node:assert/strict');
 const { chromium } = require('playwright');
@@ -15,30 +15,49 @@ const png = Buffer.from(
   'base64',
 );
 async function run(reopen) {
+  const transferResult = path.join(profile, 'transfer-result.json');
+  const portFile = path.join(profile, 'DevToolsActivePort');
+  if (existsSync(portFile)) unlinkSync(portFile);
+  if (existsSync(transferResult)) unlinkSync(transferResult);
   const child = spawn(executable, ['--remote-debugging-port=0'], {
     windowsHide: true,
-    env: { ...process.env, SUPERCARD_TEST_DATA: profile },
+    env: { ...process.env, SUPERCARD_TEST_DATA: profile, SUPERCARD_SMOKE_TRANSFERS: '1' },
     stdio: ['ignore', 'ignore', 'pipe'],
   });
   let browser;
   try {
     const endpoint = await new Promise((resolve, reject) => {
-      const timer = setTimeout(() => reject(new Error('Packaged app startup timed out')), 30000);
+      const poll = setInterval(() => {
+        if (!existsSync(portFile)) return;
+        const [port, endpoint] = readFileSync(portFile, 'utf8').trim().split(/\r?\n/);
+        if (port && endpoint) {
+          clearInterval(poll);
+          clearTimeout(timer);
+          resolve(`ws://127.0.0.1:${port}${endpoint}`);
+        }
+      }, 100);
+      const timer = setTimeout(() => {
+        clearInterval(poll);
+        reject(new Error('Packaged app startup timed out'));
+      }, 60000);
       let log = '';
       child.stderr.on('data', (chunk) => {
         log += chunk.toString();
         const match = log.match(/DevTools listening on (ws:\/\/[^\s]+)/);
         if (match) {
           clearTimeout(timer);
+          clearInterval(poll);
           resolve(match[1]);
         }
       });
       child.once('error', (error) => {
         clearTimeout(timer);
+        clearInterval(poll);
         reject(error);
       });
       child.once('exit', (code) => {
         clearTimeout(timer);
+        clearInterval(poll);
         reject(new Error(`Early exit: ${code}`));
       });
     });
@@ -111,6 +130,16 @@ async function run(reopen) {
         mathErrors: document.querySelectorAll('[data-mml-node="merror"], mjx-merror').length,
       };
     });
+    const deadline = Date.now() + 30000;
+    while (!existsSync(transferResult) && Date.now() < deadline)
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    const transfers = JSON.parse(readFileSync(transferResult, 'utf8'));
+    assert.deepEqual(transfers, {
+      csvImport: true,
+      csvExport: true,
+      backupExport: true,
+      backupRestore: true,
+    });
     assert.equal(result.nodeIntegration, 'undefined');
     assert.equal(result.decks, 1);
     assert.equal(result.cards, 1);
@@ -125,7 +154,11 @@ async function run(reopen) {
       path: path.join(output, `packaged-${reopen ? 'reopened' : 'offline'}.png`),
     });
     console.log(
-      JSON.stringify({ reopen, offline: true, isolatedProfile: true, ...result }, null, 2),
+      JSON.stringify(
+        { reopen, offline: true, isolatedProfile: true, transfers, ...result },
+        null,
+        2,
+      ),
     );
     const exited = new Promise((resolve) => child.once('exit', resolve));
     await page.evaluate(() => window.supercard.finishClose()).catch(() => {});

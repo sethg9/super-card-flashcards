@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import type { SuperCardAPI } from '../shared/types';
 const api: SuperCardAPI = {
+  cancelTransfer: () => ipcRenderer.invoke('transfer:cancel'),
   loadAppearance: () => ipcRenderer.invoke('appearance:load'),
   saveAppearance: (value) => ipcRenderer.invoke('appearance:save', value),
   chooseBackground: () => ipcRenderer.invoke('appearance:background'),

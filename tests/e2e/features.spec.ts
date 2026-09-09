@@ -44,7 +44,7 @@ test('sample import, offline MathJax, search, themes, shuffle and CSV/backup UI'
     await expect(page.locator('.import-preview mjx-container').first()).toBeVisible({
       timeout: 25_000,
     });
-    await page.getByRole('button', { name: 'Import 84 cards', exact: true }).click();
+    await page.getByRole('button', { name: 'Import cards', exact: true }).click();
     await expect(page.getByRole('dialog', { name: 'Transfer complete' })).toContainText(
       'Imported 84 cards',
     );
@@ -73,7 +73,7 @@ test('sample import, offline MathJax, search, themes, shuffle and CSV/backup UI'
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
     await expect(page.locator('.study-face[aria-hidden=false]')).toHaveCSS(
       'background-color',
-      'rgb(30, 33, 48)',
+      'rgb(26, 31, 25)',
     );
     await page.screenshot({ path: path.join(root, 'study-dark.png') });
     await page.getByRole('button', { name: 'Back to deck' }).click();

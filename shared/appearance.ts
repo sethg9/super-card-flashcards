@@ -15,7 +15,7 @@ export const DEFAULT_APPEARANCE: Appearance = {
   accent: DEFAULT_ACCENT,
   background: null,
   dimming: 0.65,
-  animateFlips: false,
+  animateFlips: true,
 };
 export function normalizeAppearance(value: unknown, legacyTheme?: string | null): Appearance {
   const v = value && typeof value === 'object' ? (value as Partial<Appearance>) : {};
@@ -33,7 +33,7 @@ export function normalizeAppearance(value: unknown, legacyTheme?: string | null)
       typeof v.dimming === 'number' && Number.isFinite(v.dimming)
         ? Math.min(0.95, Math.max(0, v.dimming))
         : 0.65,
-    animateFlips: typeof v.animateFlips === 'boolean' ? v.animateFlips : false,
+    animateFlips: typeof v.animateFlips === 'boolean' ? v.animateFlips : true,
   };
 }
 export function contrast(a: string, b: string) {
@@ -71,13 +71,22 @@ function readable(color: string, surfaces: string[], minimum: number) {
   return target;
 }
 export function accentVariables(a: Appearance): Record<string, string> {
-  const surface = a.theme === 'light' ? '#ffffff' : a.theme === 'dark' ? '#1e2130' : '#000000';
-  const bg = a.theme === 'light' ? '#f8f9fc' : a.theme === 'dark' ? '#151722' : '#000000';
+  const tint = (base: string, strength: number) => mix(base, a.accent, strength);
+  const surface =
+    a.theme === 'light' ? '#ffffff' : a.theme === 'dark' ? tint('#171717', 0.035) : '#000000';
+  const bg =
+    a.theme === 'light' ? '#f8f9fc' : a.theme === 'dark' ? tint('#0d0d0d', 0.025) : '#000000';
   const fg = contrast(a.accent, '#000000') >= contrast(a.accent, '#ffffff') ? '#000000' : '#ffffff';
   const hover = mix(a.accent, fg === '#000000' ? '#ffffff' : '#000000', 0.12);
   const pressed = mix(a.accent, fg === '#000000' ? '#ffffff' : '#000000', 0.23);
   const soft = a.theme === 'oled' ? '#000000' : mix(surface, a.accent, 0.1);
   return {
+    '--bg': bg,
+    '--surface': surface,
+    '--sidebar': a.theme === 'dark' ? tint('#111111', 0.03) : surface,
+    '--border': a.theme === 'light' ? '#e7e9f1' : tint('#303030', 0.035),
+    '--hover': a.theme === 'light' ? '#f2f3f8' : tint('#222222', 0.035),
+    '--tag': a.theme === 'light' ? '#f3f4f8' : tint('#222222', 0.035),
     '--accent': a.accent,
     '--accent-fg': fg,
     '--accent-hover': hover,

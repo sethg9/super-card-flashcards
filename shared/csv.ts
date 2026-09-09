@@ -1,4 +1,5 @@
 import Papa from 'papaparse';
+import { checkFileSize } from './limits';
 import type { CardInput } from './types';
 
 export interface ParsedImport {
@@ -27,8 +28,7 @@ const separators: Record<string, string> = {
 export const escapeHTML = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 export function parseCSV(source: string, delimiter?: string): ParsedImport {
-  if (source.length > 20_000_000)
-    throw new Error('CSV is too large. Split it into files below 20 MB.');
+  checkFileSize(utf8Size(source));
   source = source.replace(/^\uFEFF/, '');
   const headers: Record<string, string> = {};
   // Only consume leading comment lines, never lines inside a quoted field.
@@ -40,14 +40,27 @@ export function parseCSV(source: string, delimiter?: string): ParsedImport {
     source = end < 0 ? '' : source.slice(end + 1);
   }
   const configured = delimiter || separators[headers.separator?.toLowerCase()] || headers.separator;
+  const rows: string[][] = [];
+  const rowErrors: Papa.ParseError[] = [];
+  let limitError = '';
   const parsed = Papa.parse<string[]>(source, {
     delimiter: configured || '',
     skipEmptyLines: 'greedy',
     comments: '#',
     delimitersToGuess: [',', '\t', ';', '|'],
     quoteChar: '"',
+    step: (result, parser) => {
+      if (result.data.length > 100 || rows.length >= 20_001) {
+        limitError = 'Import at most 20,000 cards with 2�100 columns.';
+        parser.abort();
+        return;
+      }
+      rows.push(result.data);
+      rowErrors.push(...result.errors);
+    },
   });
-  const fatal = parsed.errors.filter((e) => e.code !== 'UndetectableDelimiter');
+  if (limitError) throw new Error(limitError);
+  const fatal = [...parsed.errors, ...rowErrors].filter((e) => e.code !== 'UndetectableDelimiter');
   if (fatal.length)
     throw new Error(
       `CSV could not be read: ${fatal
@@ -55,7 +68,6 @@ export function parseCSV(source: string, delimiter?: string): ParsedImport {
         .map((e) => `record ${(e.row ?? 0) + 1}: ${e.message}`)
         .join('; ')}`,
     );
-  const rows = parsed.data;
   if (!rows.length) throw new Error('This file contains no cards.');
   if (rows.length > 20_001) throw new Error('Import at most 20,000 cards at a time.');
   const width = Math.max(...rows.map((r) => r.length));
@@ -196,4 +208,24 @@ export function exportCSV(cards: { front: string; back: string; tags: string }[]
       { newline: '\r\n', quotes: true },
     )
   );
+}
+
+export function utf8Size(value: string) {
+  let bytes = 0;
+  for (let i = 0; i < value.length; i++) {
+    const c = value.charCodeAt(i);
+    if (c < 0x80) bytes++;
+    else if (c < 0x800) bytes += 2;
+    else if (
+      c >= 0xd800 &&
+      c <= 0xdbff &&
+      i + 1 < value.length &&
+      value.charCodeAt(i + 1) >= 0xdc00 &&
+      value.charCodeAt(i + 1) <= 0xdfff
+    ) {
+      bytes += 4;
+      i++;
+    } else bytes += 3;
+  }
+  return bytes;
 }

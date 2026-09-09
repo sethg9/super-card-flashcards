@@ -5,7 +5,7 @@ import electron from 'electron';
 import { copyAssets } from './assets.mjs';
 await copyAssets();
 await build({
-  entryPoints: ['electron/main.ts', 'electron/preload.ts'],
+  entryPoints: ['electron/main.ts', 'electron/preload.ts', 'electron/transfer-worker.ts'],
   outdir: 'dist-electron',
   outExtension: { '.js': '.cjs' },
   bundle: true,
