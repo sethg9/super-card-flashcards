@@ -1,0 +1,86 @@
+{
+  "name": "supercard",
+  "productName": "SuperCard",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Offline flashcards with math, images, and unrestricted study",
+  "author": "SuperCard",
+  "license": "MIT",
+  "main": "dist-electron/main.cjs",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "tsc --noEmit && node scripts/build.mjs",
+    "start": "npm run build && electron .",
+    "test": "tsx --test tests/*.test.ts",
+    "test:e2e": "npm run build && playwright test",
+    "dist": "npm run build && electron-builder --win nsis portable --publish never",
+    "format": "prettier --write src electron shared scripts tests",
+    "format:check": "prettier --check src electron shared scripts tests"
+  },
+  "dependencies": {
+    "dompurify": "^3.2.7",
+    "fflate": "^0.8.2",
+    "lucide-react": "^0.468.0",
+    "mathjax": "^4.0.0",
+    "papaparse": "^5.5.3",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "@types/node": "^24.0.0",
+    "@types/papaparse": "^5.3.16",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "electron": "^44.3.0",
+    "electron-builder": "^26.0.12",
+    "esbuild": "^0.25.9",
+    "jsdom": "^26.1.0",
+    "prettier": "^3.9.6",
+    "tsx": "^4.20.0",
+    "typescript": "~5.9.2",
+    "vite": "^7.1.0"
+  },
+  "build": {
+    "appId": "app.supercard.desktop",
+    "productName": "SuperCard",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*",
+      "assets/**/*",
+      "package.json",
+      "!node_modules/**/*"
+    ],
+    "asar": true,
+    "electronFuses": {
+      "runAsNode": false,
+      "enableNodeOptionsEnvironmentVariable": false,
+      "enableNodeCliInspectArguments": false,
+      "enableEmbeddedAsarIntegrityValidation": true,
+      "onlyLoadAppFromAsar": true
+    },
+    "win": {
+      "icon": "assets/icon.ico",
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "artifactName": "SuperCard-${version}-${arch}.${ext}"
+    },
+    "nsis": {
+      "artifactName": "SuperCard-Setup-${version}-${arch}.${ext}",
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": false
+    },
+    "portable": {
+      "artifactName": "SuperCard-Portable-${version}-${arch}.${ext}"
+    },
+    "npmRebuild": false
+  }
+}

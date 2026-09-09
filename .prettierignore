@@ -1,0 +1,10 @@
+node_modules
+dist
+dist-electron
+release
+public/mathjax
+public/mathjax-newcm-font
+.test-output
+*.csv
+*.tsv
+package-lock.json
