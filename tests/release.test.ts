@@ -79,6 +79,13 @@ test('supported image dimension readers reject oversized and malformed headers',
   assert.deepEqual(imageDimensions(png, 'png'), { width: 8000, height: 5000 });
   png.writeUInt32BE(5001, 20);
   assert.throws(() => imageDimensions(png, 'png'), /40 megapixels/);
+  const { BACKGROUND_PIXELS } = await import('../shared/limits');
+  png.writeUInt32BE(6000, 20);
+  assert.deepEqual(imageDimensions(png, 'png', BACKGROUND_PIXELS), { width: 8000, height: 6000 });
+  png.writeUInt32BE(15000, 20);
+  assert.equal(imageDimensions(png, 'png', BACKGROUND_PIXELS).height, 15000);
+  png.writeUInt32BE(15001, 20);
+  assert.throws(() => imageDimensions(png, 'png', BACKGROUND_PIXELS), /120 megapixels/);
   const gif = Buffer.alloc(13);
   gif.writeUInt16LE(2, 6);
   gif.writeUInt16LE(3, 8);

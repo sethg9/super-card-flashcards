@@ -1,6 +1,6 @@
 import { IMAGE_PIXELS } from '../shared/limits';
 /** Read dimensions without allocating a decoded bitmap. All marker walks are bounded. */
-export function imageDimensions(bytes: Uint8Array, ext: string) {
+export function imageDimensions(bytes: Uint8Array, ext: string, pixelLimit = IMAGE_PIXELS) {
   const b = Buffer.from(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   let width = 0,
     height = 0;
@@ -64,7 +64,11 @@ export function imageDimensions(bytes: Uint8Array, ext: string) {
       offset = start + length + (length % 2);
     }
   }
-  if (!width || !height || width * height > IMAGE_PIXELS)
-    throw new Error('Image could not be read or exceeds 40 megapixels.');
+  if (!width || !height)
+    throw new Error('Image dimensions could not be read. The file may be malformed.');
+  if (width * height > pixelLimit || width > 32768 || height > 32768)
+    throw new Error(
+      `Image exceeds the decoding safety limit (${pixelLimit / 1_000_000} megapixels; 32768 pixels per side).`,
+    );
   return { width, height };
 }

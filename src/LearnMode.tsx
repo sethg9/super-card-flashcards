@@ -4,12 +4,17 @@ import type { Card } from '../shared/types';
 import { classifyLearn, reviewRemaining, startLearn } from '../shared/learn';
 import { studyShortcut } from './study-shortcuts';
 import StudyCard from './StudyCard';
+import FocusButton from './FocusButton';
 export default function LearnMode({
+  focusView,
+  onToggleFocus,
   cards,
   name,
   animate,
   onExit,
 }: {
+  focusView: boolean;
+  onToggleFocus: () => void;
   cards: Card[];
   name: string;
   animate: boolean;
@@ -27,18 +32,13 @@ export default function LearnMode({
   useEffect(() => () => clearTimeout(timer.current), []);
   useEffect(() => {
     if (done) summary.current?.focus();
-    else
-      stage.current
-        ?.querySelector<HTMLElement>('.study-face[aria-hidden="false"]')
-        ?.focus({ preventScroll: true });
+    else stage.current?.focus({ preventScroll: true });
   }, [session.index, session.round, done]);
   const classify = (known: boolean) => {
     if (locked.current || done || document.querySelector('[role="dialog"]')) return;
     locked.current = true;
     setVerdict(known ? 'right' : 'left');
-    setFeedback(
-      known ? 'Know it — added to the right pile' : 'Still learning — added to the left pile',
-    );
+    setFeedback(known ? 'Know it!' : 'Still learning');
     // Keep the same short input guard with reduced motion; feedback itself is immediate.
     timer.current = setTimeout(() => {
       setSession((old) => classifyLearn(old, known));
@@ -81,6 +81,7 @@ export default function LearnMode({
         </button>
         <span>{name}</span>
         <span className="pill">LEARN</span>
+        <FocusButton active={focusView} onToggle={onToggleFocus} />
       </div>
       {!cards.length ? (
         <div className="learn-summary">
@@ -115,7 +116,6 @@ export default function LearnMode({
             </button>
           )}
           <button onClick={onExit}>Return to library</button>
-          <p className="muted">Your deck is unchanged. All cards remain available.</p>
         </div>
       ) : (
         <>
@@ -132,6 +132,7 @@ export default function LearnMode({
             <div style={{ width: `${(session.index / session.cards.length) * 100}%` }} />
           </div>
           <div
+            tabIndex={-1}
             ref={stage}
             className={`learn-stage ${verdict ? `to-${verdict}` : ''}`}
             aria-busy={!!verdict}
@@ -176,14 +177,16 @@ export default function LearnMode({
           </div>
         </>
       )}
-      <div
-        role="status"
-        aria-live="polite"
-        aria-atomic="true"
-        className={`learn-feedback ${verdict ? 'visible' : ''}`}
-      >
-        {feedback || 'Flip with click, Space, Up or Down. Classify before or after flipping.'}
-      </div>
+      {!done && (
+        <div
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+          className={`learn-feedback ${verdict ? 'visible' : ''}`}
+        >
+          {feedback || 'Flip with click, Space, Up or Down. Classify before or after flipping.'}
+        </div>
+      )}
     </section>
   );
 }

@@ -759,7 +759,7 @@ h2 {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: #15182966;
+  background: #00000066;
   backdrop-filter: blur(5px);
   z-index: 40;
   display: flex;

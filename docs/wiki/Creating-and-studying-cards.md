@@ -24,3 +24,7 @@ For math and pictures, see [MathJax and images](https://github.com/sethg9/super-
 Select **Learn deck** to begin with every card. Flip before or after answering, then choose **Still learning** (X or Left arrow) or **Know it** (checkmark or Right arrow). A brief pile indicator confirms the choice; rapid repeated inputs are ignored while the current card is classified. The next card starts on its front. Reduced motion removes the movement.
 
 At the end of a round, review the totals and choose **Review remaining cards**. Only cards marked Still learning appear in the next round. Repeat until none remain, then study the full deck again or return to the library. If every card needs more practice, the next round includes them all. **Exit Learn** or Escape leaves the session. Progress is temporary: it never changes your deck, hides cards permanently, or creates a schedule.
+
+## Focus view
+
+Use **Enter focus view** in either Study or Learn to hide the sidebar and give cards more room. Use **Exit focus view** or Escape to restore the normal layout; your card, side and round stay the same. Escape closes a dialog first when one is open. This is an in-app view, so native window controls remain available. Leaving the study session also restores the normal layout.

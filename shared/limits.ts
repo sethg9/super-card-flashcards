@@ -2,6 +2,8 @@
 export const FILE_LIMIT = 200 * 1024 * 1024;
 export const FILE_LIMIT_LABEL = '200 MB (209,715,200 bytes)';
 export const IMAGE_PIXELS = 40_000_000;
+export const BACKGROUND_PIXELS = 120_000_000;
+export const BACKGROUND_EDGE = 3840;
 export function checkFileSize(size: number, limit = FILE_LIMIT) {
   if (!Number.isSafeInteger(size) || size < 0 || size > limit)
     throw new Error(

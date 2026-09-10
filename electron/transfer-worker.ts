@@ -3,9 +3,10 @@ import { readFileSync, statSync, writeFileSync, renameSync, unlinkSync, existsSy
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { Store } from './store';
-import { MediaStore } from './media';
+import { MediaStore, imageExtension } from './media';
+import { imageDimensions } from './image-dimensions';
 import { parseCSV } from '../shared/csv';
-import { FILE_LIMIT, checkFileSize } from '../shared/limits';
+import { FILE_LIMIT, BACKGROUND_PIXELS, checkFileSize } from '../shared/limits';
 import { importCards, makeBackup, makeCSVArchive, readBackup, restoreBackup } from './transfers';
 const store = new Store(workerData.root);
 const media = new MediaStore(workerData.root);
@@ -31,6 +32,11 @@ function preview() {
   };
 }
 function run(op: string, args: any): any {
+  if (op === 'inspectBackground') {
+    const bytes = read(args.file);
+    const ext = imageExtension(bytes);
+    return { ext, ...imageDimensions(bytes, ext, BACKGROUND_PIXELS) };
+  }
   if (op === 'image') return media.add(args.bytes || read(args.file));
   if (op === 'csv') {
     const source = new TextDecoder('utf-8', { fatal: true }).decode(read(args.file));

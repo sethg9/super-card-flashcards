@@ -189,8 +189,8 @@ export default function CardEditor({
       >
         <div className="modal-heading">
           <div>
-            <span className="eyebrow">{deckName}</span>
-            <h2>{card.id ? 'Edit your card' : 'One idea. Two sides.'}</h2>
+            <h2 className="editor-deck-name">{deckName}</h2>
+            <span>{card.id ? 'Edit card' : 'New card'}</span>
           </div>
           <button
             type="button"

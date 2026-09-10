@@ -111,6 +111,11 @@ async function run(reopen) {
     });
     await page.getByRole('button', { name: 'Flip card', exact: true }).click();
     await page.locator('.study-back[aria-hidden=false] mjx-container svg').first().waitFor();
+    await page.getByRole('button', { name: 'Enter focus view' }).click();
+    assert.equal(await page.locator('.sidebar').isVisible(), false);
+    await page.keyboard.press('Escape');
+    assert.equal(await page.locator('.sidebar').isVisible(), true);
+    assert.equal(await page.locator('.study-back').getAttribute('aria-hidden'), 'false');
     await page.getByRole('button', { name: 'Back to deck' }).click();
     await page.getByRole('button', { name: 'Learn deck', exact: true }).click();
     await page.locator('.study-front mjx-container svg').first().waitFor();
@@ -119,6 +124,9 @@ async function run(reopen) {
     await page.getByRole('button', { name: 'Review remaining cards' }).click();
     await page.getByRole('button', { name: 'Know it, Right arrow' }).click();
     await page.getByRole('heading', { name: 'You know every card!' }).waitFor();
+    assert.equal(await page.locator('.learn-feedback').count(), 0);
+    await page.getByRole('button', { name: 'Enter focus view' }).click();
+    assert.equal(await page.locator('.sidebar').isVisible(), false);
     const result = await page.evaluate(async () => {
       const resources = await Promise.all(
         [

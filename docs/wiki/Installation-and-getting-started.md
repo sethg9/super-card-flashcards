@@ -2,8 +2,8 @@
 
 | Download | Best for | How to launch |
 | --- | --- | --- |
-| `SuperCard-Setup-0.4.0-x64.exe` | Normal installation and shortcuts | Run the installer, follow the wizard, then open SuperCard from Start. |
-| `SuperCard-Portable-0.4.0-x64.exe` | Running without an installation wizard | Save it somewhere convenient and double-click it. Initial extraction can take a moment. |
+| `SuperCard-Setup-0.5.0-x64.exe` | Normal installation and shortcuts | Run the installer, follow the wizard, then open SuperCard from Start. |
+| `SuperCard-Portable-0.5.0-x64.exe` | Running without an installation wizard | Save it somewhere convenient and double-click it. Initial extraction can take a moment. |
 
 Both downloads are for Windows x64. Both store cards, settings, and copied images in **`%APPDATA%\SuperCard`** on the current computer. **The portable executable does not carry your library with it.** Use a library backup to move cards between computers. Both versions use the same library when launched normally on the same account.
 

@@ -340,11 +340,11 @@ main {
     opacity 280ms ease;
 }
 .learn-stage.to-left {
-  transform: translateX(-65px) rotate(-4deg);
+  transform: translateX(-20px);
   opacity: 0.35;
 }
 .learn-stage.to-right {
-  transform: translateX(65px) rotate(4deg);
+  transform: translateX(20px);
   opacity: 0.35;
 }
 .learn-actions {
@@ -404,4 +404,102 @@ main {
     min-width: 0;
     flex: 1;
   }
+}
+
+/* Neutral image fading follows the active theme without changing saved opacity. */
+:root {
+  --background-fade: #fff;
+}
+:root[data-theme='dark'],
+:root[data-theme='oled'] {
+  --background-fade: #000;
+}
+.app-wallpaper > div,
+.background-dimmer {
+  background: var(--background-fade);
+}
+.study-banner {
+  display: grid;
+  grid-template-columns: minmax(0, 240px) auto minmax(0, 240px);
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 24px;
+}
+.study-banner .primary {
+  margin: 0;
+  min-width: 0;
+  width: 100%;
+}
+.action-or {
+  flex: 0 0 auto;
+}
+.deck-heading h1 {
+  margin-top: 0;
+}
+.deck-name-field input {
+  font-size: 22px;
+  font-weight: 600;
+}
+.editor-deck-name {
+  font-size: 26px;
+  overflow-wrap: anywhere;
+}
+.learn-stage:focus,
+.learn-summary h2:focus {
+  outline: none;
+}
+.learn-view {
+  overflow-x: clip;
+}
+.learn-stage {
+  margin: 0 22px;
+}
+.study-heading {
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.focus-view .sidebar {
+  display: none;
+}
+.focus-view main {
+  margin-left: 0;
+  width: 100%;
+}
+.focus-view .study-view {
+  max-width: 1200px;
+  width: 100%;
+  padding: 28px clamp(16px, 4vw, 60px);
+}
+@media (max-width: 720px) {
+  .study-banner {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .study-banner .primary {
+    min-width: 0;
+    width: 100%;
+    padding: 12px;
+  }
+  .learn-stage {
+    margin: 0 12px;
+  }
+  .learn-stage.to-left {
+    transform: translateX(-10px);
+  }
+  .learn-stage.to-right {
+    transform: translateX(10px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .learn-stage.to-left,
+  .learn-stage.to-right {
+    transform: none;
+  }
+}
+.study-heading > span:not(.pill) {
+  display: block;
+  max-width: 45%;
+  overflow-wrap: anywhere;
 }

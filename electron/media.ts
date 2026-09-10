@@ -13,8 +13,8 @@ import { IMAGE_LIMIT, MANAGED_IMAGE, mapImageReferences } from '../shared/images
 
 export function imageExtension(bytes: Uint8Array): string {
   const b = Buffer.from(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-  if (b.length < 12 || b.length > IMAGE_LIMIT)
-    throw new Error('Choose an image up to 200 MB (209,715,200 bytes).');
+  if (b.length > IMAGE_LIMIT) throw new Error('Choose an image up to 200 MB (209,715,200 bytes).');
+  if (b.length < 12) throw new Error('Invalid image. Choose a PNG, JPEG, GIF, or WebP file.');
   if (b.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))) return 'png';
   if (b[0] === 255 && b[1] === 216 && b[2] === 255) return 'jpg';
   if (/^GIF8[79]a$/.test(b.toString('ascii', 0, 6))) return 'gif';

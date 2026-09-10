@@ -29,6 +29,7 @@ import Modal from './Modal';
 import AppearanceDialog from './AppearanceDialog';
 import StudyCard from './StudyCard';
 import LearnMode from './LearnMode';
+import FocusButton from './FocusButton';
 import { studyShortcut } from './study-shortcuts';
 import { useAppearance } from './useAppearance';
 
@@ -50,6 +51,26 @@ export default function App() {
   const [deleting, setDeleting] = useState<{ id: string; kind: 'deck' | 'card' } | null>(null);
   const [learn, setLearn] = useState<Card[] | null>(null);
   const [study, setStudy] = useState<Card[] | null>(null);
+  const [focusView, setFocusView] = useState(false);
+  useEffect(() => {
+    if (!study && !learn) setFocusView(false);
+  }, [study, learn]);
+  useEffect(() => {
+    const escape = (e: KeyboardEvent) => {
+      if (
+        focusView &&
+        e.key === 'Escape' &&
+        !e.defaultPrevented &&
+        !document.querySelector('[role="dialog"],[role="menu"],[role="listbox"]')
+      ) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        setFocusView(false);
+      }
+    };
+    window.addEventListener('keydown', escape, true);
+    return () => window.removeEventListener('keydown', escape, true);
+  }, [focusView]);
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -135,7 +156,7 @@ export default function App() {
   }, [study]);
   return (
     <div
-      className={`app-shell ${preferences.appearance.background && !backgroundMissing ? 'has-background' : ''}`}
+      className={`app-shell ${focusView && (study || learn) ? 'focus-view' : ''} ${preferences.appearance.background && !backgroundMissing ? 'has-background' : ''}`}
     >
       {preferences.appearance.background && !backgroundMissing && (
         <div className="app-wallpaper" aria-hidden="true">
@@ -219,17 +240,9 @@ export default function App() {
         </div>
       </aside>
       <main>
-        <header className="topbar">
-          <span>
-            Library <span className="slash">/</span>{' '}
-            <strong>
-              {learn ? 'Learn session' : study ? 'Study session' : deck?.name || 'Welcome'}
-            </strong>
-          </span>
-        </header>
         {busy && (
           <div role="status" className="transfer-status">
-            Processing files�{' '}
+            Processing files…{' '}
             <button onClick={() => api.cancelTransfer()}>Cancel preparation</button>
           </div>
         )}
@@ -262,6 +275,8 @@ export default function App() {
           </div>
         ) : learn ? (
           <LearnMode
+            focusView={focusView}
+            onToggleFocus={() => setFocusView((v) => !v)}
             cards={learn}
             name={deck?.name || 'Learn'}
             animate={preferences.appearance.animateFlips}
@@ -275,6 +290,7 @@ export default function App() {
               </button>
               <span>{deck?.name}</span>
               <span className="pill">FLASHCARDS</span>
+              <FocusButton active={focusView} onToggle={() => setFocusView((v) => !v)} />
             </div>
             <div className="study-progress">
               <span>
@@ -357,11 +373,9 @@ export default function App() {
           <section className="deck-view">
             <div className="deck-heading">
               <div>
-                <span className="eyebrow">YOUR SPACE TO LEARN</span>
                 <h1>{deck.name}</h1>
                 <p>
-                  {cards.length} {cards.length === 1 ? 'card' : 'cards'}{' '}
-                  <span className="bullet">·</span> Ready whenever you are
+                  {cards.length} {cards.length === 1 ? 'card' : 'cards'}
                 </p>
               </div>
               <div className="heading-actions">
@@ -389,13 +403,6 @@ export default function App() {
               </div>
             </div>
             <div className="study-banner">
-              <div className="banner-icon">
-                <Layers size={28} />
-              </div>
-              <div>
-                <h2>A fresh look. A little more understanding.</h2>
-                <p>Flip through your cards at your own pace.</p>
-              </div>
               <button
                 className="primary"
                 disabled={!cards.length}
@@ -407,7 +414,9 @@ export default function App() {
               >
                 <Play size={17} fill="currentColor" /> Study deck
               </button>
+              <span className="eyebrow action-or">OR</span>
               <button
+                className="primary"
                 disabled={!cards.length}
                 onClick={() => {
                   setStudy(null);
@@ -445,13 +454,8 @@ export default function App() {
             </div>
             {!filtered.length ? (
               <div className="empty card-empty">
-                <Layers size={32} />
-                <h2>{query ? 'No matching cards' : 'Start with a spark.'}</h2>
-                <p>
-                  {query
-                    ? 'Try another word, equation, or tag.'
-                    : 'Add a question on the front and an idea on the back.'}
-                </p>
+                <h2>{query ? 'No matching cards' : 'No cards yet'}</h2>
+                {query && <p>Try another word, equation, or tag.</p>}
                 {!query && (
                   <button
                     onClick={() => setEditor({ deckId: deck.id, front: '', back: '', tags: '' })}
@@ -551,12 +555,12 @@ export default function App() {
             }}
           >
             <div className="modal-heading">
-              <h2>{deckDialog.id ? 'Rename deck' : 'A new place to learn'}</h2>
+              <h2>{deckDialog.id ? 'Rename deck' : 'Create deck'}</h2>
               <button type="button" aria-label="Close" onClick={() => setDeckDialog(null)}>
                 <X size={20} />
               </button>
             </div>
-            <label className="field">
+            <label className="field deck-name-field">
               Deck name
               <input
                 autoFocus

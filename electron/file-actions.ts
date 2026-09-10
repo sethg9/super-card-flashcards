@@ -6,6 +6,7 @@ import { textValue } from './store';
 import type { MediaStore } from './media';
 import { Transfers } from './transfer-runner';
 import { checkFileSize } from '../shared/limits';
+import { resizeBackground } from './background';
 type Register = (channel: string, handler: (...args: any[]) => unknown) => void;
 export function registerFileActions(
   handle: Register,
@@ -14,6 +15,7 @@ export function registerFileActions(
   getWindow: () => BrowserWindow,
 ) {
   const transfers = new Transfers(store.root);
+  let preparingBackground = false;
   let mediaFolder: { token: string; path: string } | undefined;
   handle('transfer:cancel', () => transfers.cancel());
   handle('image:add', (bytes) => {
@@ -27,7 +29,9 @@ export function registerFileActions(
       properties: background ? ['openFile'] : ['openFile', 'multiSelections'],
       filters: [
         {
-          name: 'Images (up to 200 MB; 40 megapixels)',
+          name: background
+            ? 'Background images (up to 200 MB)'
+            : 'Images (up to 200 MB; 40 megapixels)',
           extensions: ['png', 'jpg', 'jpeg', 'gif', 'webp'],
         },
       ],
@@ -35,10 +39,24 @@ export function registerFileActions(
     if (result.canceled) return [];
     if (result.filePaths.length > 20) throw new Error('Insert at most 20 images at a time.');
     const names: string[] = [];
-    for (const file of result.filePaths) names.push(await transfers.run('image', { file }));
+    for (const file of result.filePaths) {
+      if (background) {
+        const info = await transfers.run('inspectBackground', { file });
+        const bytes = await resizeBackground(file, info);
+        names.push(await transfers.run('image', { bytes }));
+      } else names.push(await transfers.run('image', { file }));
+    }
     return names;
   };
-  handle('appearance:background', async () => (await images(true))[0] || null);
+  handle('appearance:background', async () => {
+    if (preparingBackground) throw new Error('A background is already being prepared.');
+    preparingBackground = true;
+    try {
+      return (await images(true))[0] || null;
+    } finally {
+      preparingBackground = false;
+    }
+  });
   handle('image:pick', () => images(false));
   handle('csv:choose', async () => {
     const result = await dialog.showOpenDialog(getWindow(), {

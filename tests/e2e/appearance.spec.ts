@@ -54,7 +54,7 @@ test('appearance, managed backgrounds, contrast extremes, flips and restart pers
     }, invalid);
     await page.getByRole('button', { name: 'Replace image', exact: true }).click();
     await expect(page.getByRole('alert').last()).toContainText(/image|Image|Supported/);
-    await page.getByLabel('Background dimming').evaluate((el: HTMLInputElement) => {
+    await page.getByLabel('Background fade').evaluate((el: HTMLInputElement) => {
       Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!.call(el, '35');
       el.dispatchEvent(new Event('input', { bubbles: true }));
     });
@@ -69,7 +69,7 @@ test('appearance, managed backgrounds, contrast extremes, flips and restart pers
       'aria-pressed',
       'true',
     );
-    await expect(page.getByLabel('Background dimming')).toHaveValue('35');
+    await expect(page.getByLabel('Background fade')).toHaveValue('35');
     await expect(page.getByRole('switch', { name: 'Animate card flips' })).toBeChecked();
     await expect
       .poll(() =>

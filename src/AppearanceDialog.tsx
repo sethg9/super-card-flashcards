@@ -28,7 +28,6 @@ export default function AppearanceDialog({
     >
       <div className="modal-heading">
         <div>
-          <span className="eyebrow">MAKE IT YOURS</span>
           <h2>Appearance</h2>
         </div>
         <button aria-label="Close appearance" disabled={busy} onClick={onClose}>
@@ -121,8 +120,7 @@ export default function AppearanceDialog({
         <div
           className="background-preview"
           style={{
-            backgroundColor:
-              value.theme === 'light' ? '#f8f9fc' : value.theme === 'oled' ? '#000000' : '#151722',
+            backgroundColor: 'var(--bg)',
           }}
           aria-label="Background preview"
         >
@@ -143,7 +141,8 @@ export default function AppearanceDialog({
           <span className="background-example">Your cards stay readable</span>
         </div>
         <p className="muted">
-          PNG, JPEG, GIF or WebP � up to 200 MB (209,715,200 bytes) and 40 megapixels.
+          PNG, JPEG, GIF or WebP — up to 200 MB (209,715,200 bytes) — large photos are resized to a
+          3840-pixel display copy. HEIC/HEIF is unsupported; export as JPEG first.
         </p>
         <div className="background-actions">
           <button
@@ -162,7 +161,7 @@ export default function AppearanceDialog({
             }}
           >
             <ImagePlus size={16} />
-            {busy ? 'Processing image�' : value.background ? 'Replace image' : 'Choose image'}
+            {busy ? 'Processing image…' : value.background ? 'Replace image' : 'Choose image'}
           </button>
           {value.background && (
             <button disabled={busy} onClick={() => update({ background: null })}>
@@ -171,9 +170,9 @@ export default function AppearanceDialog({
           )}
         </div>
         <label className="field dimming-control">
-          Background dimming · {Math.round(value.dimming * 100)}%
+          Background fade · {Math.round(value.dimming * 100)}%
           <input
-            aria-label="Background dimming"
+            aria-label="Background fade"
             type="range"
             min="0"
             max="95"
