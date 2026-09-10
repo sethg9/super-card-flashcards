@@ -20,8 +20,10 @@ test('200 MiB byte boundaries are inclusive and consistent for CSV/images', () =
   for (const source of ['abc', 'é東京🙂', '\ud800'])
     assert.equal(utf8Size(source), Buffer.byteLength(source));
 });
-test('README CSV example imports through the real database path', () => {
-  const example = readFileSync('README.md', 'utf8').match(/```csv\r?\n([\s\S]*?)```/)![1];
+test('Wiki CSV example imports through the real database path', () => {
+  const example = readFileSync('docs/wiki/CSV-import-and-export.md', 'utf8').match(
+    /```csv\r?\n([\s\S]*?)```/,
+  )![1];
   const parsed = parseCSV(example),
     mapping = defaultMapping(parsed);
   assert.equal(mapping.hasHeader, true);

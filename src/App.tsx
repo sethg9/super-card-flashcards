@@ -28,6 +28,7 @@ import ImportDialog from './ImportDialog';
 import Modal from './Modal';
 import AppearanceDialog from './AppearanceDialog';
 import StudyCard from './StudyCard';
+import LearnMode from './LearnMode';
 import { studyShortcut } from './study-shortcuts';
 import { useAppearance } from './useAppearance';
 
@@ -47,6 +48,7 @@ export default function App() {
   const [editor, setEditor] = useState<Partial<Card> | null>(null);
   const [deckDialog, setDeckDialog] = useState<{ id?: string; name: string } | null>(null);
   const [deleting, setDeleting] = useState<{ id: string; kind: 'deck' | 'card' } | null>(null);
+  const [learn, setLearn] = useState<Card[] | null>(null);
   const [study, setStudy] = useState<Card[] | null>(null);
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
@@ -175,6 +177,7 @@ export default function App() {
                 setSelected(d.id);
                 setQuery('');
                 setStudy(null);
+                setLearn(null);
               }}
             >
               <Layers size={18} />
@@ -219,7 +222,9 @@ export default function App() {
         <header className="topbar">
           <span>
             Library <span className="slash">/</span>{' '}
-            <strong>{study ? 'Study session' : deck?.name || 'Welcome'}</strong>
+            <strong>
+              {learn ? 'Learn session' : study ? 'Study session' : deck?.name || 'Welcome'}
+            </strong>
           </span>
         </header>
         {busy && (
@@ -255,6 +260,13 @@ export default function App() {
               </button>
             )}
           </div>
+        ) : learn ? (
+          <LearnMode
+            cards={learn}
+            name={deck?.name || 'Learn'}
+            animate={preferences.appearance.animateFlips}
+            onExit={() => setLearn(null)}
+          />
         ) : study ? (
           <section className="study-view">
             <div className="study-heading">
@@ -394,6 +406,15 @@ export default function App() {
                 }}
               >
                 <Play size={17} fill="currentColor" /> Study deck
+              </button>
+              <button
+                disabled={!cards.length}
+                onClick={() => {
+                  setStudy(null);
+                  setLearn([...cards]);
+                }}
+              >
+                <Check size={17} /> Learn deck
               </button>
             </div>
             <div className="card-toolbar">
@@ -691,8 +712,13 @@ export default function App() {
           </p>
           <h3>Quick guide</h3>
           <p>
-            Click a card or press Space, Up, or Down to flip it. Left/Right arrows move between
-            cards. Page Up/Down scroll long cards. Escape returns to the deck.
+            Flashcards uses Left/Right for previous/next. Learn uses Left for Still learning and
+            Right for Know it. At each round's end, review only the remaining cards. Learn progress
+            stays in the session and never changes your deck.
+          </p>
+          <p>
+            Click a card or press Space, Up, or Down to flip it. Left/Right behavior depends on your
+            study mode. Page Up/Down scroll long cards. Escape returns to the deck.
           </p>
           <p>
             Open Appearance in the sidebar for themes, accent colors, backgrounds, and Animate card

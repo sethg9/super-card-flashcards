@@ -4,7 +4,7 @@ Tests use synthetic cards, generated image bytes, and isolated profiles under `.
 
 ## Automated checks
 
-Latest verification: 19 unit tests and all 6 Electron desktop tests passed. The TypeScript/production build passed. Light and OLED screenshots were reviewed; hardware-specific animation smoothness remains a manual check.
+Latest verification: 21 unit tests and all 7 Electron desktop tests passed. The TypeScript/production build passed. Light and OLED screenshots were reviewed; hardware-specific animation smoothness remains a manual check.
 
 - `npm test`: SQLite persistence/rollback, CSV/TSV round trips, Unicode and multiline fields, headers and unsupported-feature reporting, media validation, portable restoration, unsafe archive rejection, sanitization, preference migration, additive settings storage, and accent contrast across Light/Dark/OLED with extreme and representative colors.
 - `npm run test:e2e`: real Electron workflows for create/save/study/restart; immediate-close saving; synthetic CSV previews; offline math; image selection/drop/Windows clipboard paste; search and transfers; theme/accent controls; managed background persistence/removal; invalid images; long math cards; repeated flips; navigation resets; hidden-face isolation; reduced motion; preference restoration after restart.
@@ -23,3 +23,5 @@ Run builds sequentially. Native file picker selections use deterministic paths i
 Deck backups include saved study content and its images. Appearance-only backgrounds/preferences are local settings outside the deck backup format.
 
 Release 0.3.0 adds exact 200 MiB CSV acceptance and one-byte-over rejection, responsive preparation/cancellation, README example import, keyboard exclusions, default-animation migration, dark hue/OLED checks, and bounded image-dimension readers. Packaged smoke mode (`SUPERCARD_SMOKE_TRANSFERS=1` with an absolute `SUPERCARD_TEST_DATA`) also runs synthetic CSV export/import and backup restoration in a separate subprofile. This is main-process-only and does not add renderer capabilities.
+
+Version 0.4.0 adds focused Learn model and Electron checks for classification, repeated remaining-card rounds, completion, rapid/repeated keys, reduced motion, math/images, dialog isolation, and unchanged Flashcards navigation. Packaged smoke checks also complete a Learn round and review a remaining card. The compatible CSV example now lives in docs/wiki/CSV-import-and-export.md.

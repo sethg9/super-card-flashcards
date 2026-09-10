@@ -1,5 +1,5 @@
 /** Study commands leave native editing and control keyboard behavior intact. */
-export function studyShortcut(e: KeyboardEvent, dialogOpen: boolean) {
+export function studyShortcut(e: KeyboardEvent, dialogOpen: boolean, learnControls = false) {
   const target = e.target as HTMLElement | null;
   if (
     dialogOpen ||
@@ -18,7 +18,16 @@ export function studyShortcut(e: KeyboardEvent, dialogOpen: boolean) {
     )
   )
     return null;
-  if (target?.closest?.('button,a,[role="button"]') && !target.closest('.study-face')) return null;
+  if (
+    target?.closest?.('button,a,[role="button"]') &&
+    !target.closest('.study-face') &&
+    !(
+      learnControls &&
+      target.closest('.learn-actions') &&
+      ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)
+    )
+  )
+    return null;
   if (e.code === 'Space' || ['ArrowUp', 'ArrowDown'].includes(e.key)) return 'flip';
   if (e.key === 'ArrowLeft') return 'previous';
   if (e.key === 'ArrowRight') return 'next';

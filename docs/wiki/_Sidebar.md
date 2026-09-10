@@ -1,0 +1,7 @@
+- [Home](https://github.com/sethg9/super-card-flashcards/wiki/Home)
+- [Installation and getting started](https://github.com/sethg9/super-card-flashcards/wiki/Installation-and-getting-started)
+- [Creating and studying cards](https://github.com/sethg9/super-card-flashcards/wiki/Creating-and-studying-cards)
+- [CSV import/export and LLM prompt](https://github.com/sethg9/super-card-flashcards/wiki/CSV-import-and-export)
+- [MathJax and images](https://github.com/sethg9/super-card-flashcards/wiki/MathJax-and-images)
+- [Themes and appearance](https://github.com/sethg9/super-card-flashcards/wiki/Themes-and-appearance)
+- [Backups and storage](https://github.com/sethg9/super-card-flashcards/wiki/Backups-and-storage)

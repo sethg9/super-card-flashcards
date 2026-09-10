@@ -13,10 +13,12 @@ import path from 'node:path';
 import { FILE_LIMIT } from '../../shared/limits';
 const root = path.resolve('.test-output');
 mkdirSync(root, { recursive: true });
-test('README import, exact 200 MB boundary, responsive preparation, and keyboard controls', async () => {
+test('Wiki import, exact 200 MB boundary, responsive preparation, and keyboard controls', async () => {
   test.setTimeout(120000);
   const profile = mkdtempSync(path.join(root, 'release-ui-'));
-  const example = readFileSync('README.md', 'utf8').match(/```csv\r?\n([\s\S]*?)```/)![1];
+  const example = readFileSync('docs/wiki/CSV-import-and-export.md', 'utf8').match(
+    /```csv\r?\n([\s\S]*?)```/,
+  )![1];
   const large = path.join(profile, 'large-synthetic.csv');
   const tail = Buffer.from('\n' + example);
   const fd = openSync(large, 'w');
