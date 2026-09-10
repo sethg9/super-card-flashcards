@@ -64,6 +64,7 @@ test('settings table is additive and preferences persist without changing cards 
     theme: 'oled' as const,
     accent: '#123456',
     background: 'a'.repeat(64) + '.png',
+    cardFontSize: 32,
     animateFlips: true,
   };
   store.saveAppearance(saved);
@@ -72,6 +73,14 @@ test('settings table is additive and preferences persist without changing cards 
   assert.deepEqual(store.loadAppearance(), saved);
   assert.deepEqual(store.load(), before);
   store.close();
+});
+
+test('card font size safely migrates and clamps without changing explicit choices', () => {
+  assert.equal(normalizeAppearance({ animateFlips: false }).cardFontSize, 25);
+  assert.equal(normalizeAppearance({ cardFontSize: 31 }).cardFontSize, 31);
+  assert.equal(normalizeAppearance({ cardFontSize: 100 }).cardFontSize, 36);
+  assert.equal(normalizeAppearance({ cardFontSize: 0 }).cardFontSize, 16);
+  assert.equal(normalizeAppearance({ cardFontSize: NaN }).cardFontSize, 25);
 });
 
 test('saved animation opt-out survives migration; dark tint follows accent and OLED stays black', () => {

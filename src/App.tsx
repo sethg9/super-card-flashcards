@@ -239,7 +239,7 @@ export default function App() {
           </button>
         </div>
       </aside>
-      <main>
+      <main className={study || learn ? 'studying' : undefined}>
         {busy && (
           <div role="status" className="transfer-status">
             Processing files…{' '}

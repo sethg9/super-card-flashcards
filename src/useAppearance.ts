@@ -37,6 +37,7 @@ export function useAppearance() {
   useEffect(() => {
     const root = document.documentElement;
     root.dataset.theme = appearance.theme;
+    root.style.setProperty('--card-font-size', `${appearance.cardFontSize}px`);
     for (const [key, value] of Object.entries(accentVariables(appearance)))
       root.style.setProperty(key, value);
     if (!loaded) return;

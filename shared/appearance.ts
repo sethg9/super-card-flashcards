@@ -7,6 +7,7 @@ export interface Appearance {
   background: string | null;
   dimming: number;
   animateFlips: boolean;
+  cardFontSize: number;
 }
 export const DEFAULT_ACCENT = '#78f542';
 export const DEFAULT_APPEARANCE: Appearance = {
@@ -16,6 +17,7 @@ export const DEFAULT_APPEARANCE: Appearance = {
   background: null,
   dimming: 0.65,
   animateFlips: true,
+  cardFontSize: 25,
 };
 export function normalizeAppearance(value: unknown, legacyTheme?: string | null): Appearance {
   const v = value && typeof value === 'object' ? (value as Partial<Appearance>) : {};
@@ -34,6 +36,10 @@ export function normalizeAppearance(value: unknown, legacyTheme?: string | null)
         ? Math.min(0.95, Math.max(0, v.dimming))
         : 0.65,
     animateFlips: typeof v.animateFlips === 'boolean' ? v.animateFlips : true,
+    cardFontSize:
+      typeof v.cardFontSize === 'number' && Number.isFinite(v.cardFontSize)
+        ? Math.round(Math.min(36, Math.max(16, v.cardFontSize)))
+        : 25,
   };
 }
 export function contrast(a: string, b: string) {

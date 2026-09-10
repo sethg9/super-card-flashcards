@@ -30,44 +30,46 @@ export default function StudyCard({
   }, [flipped]);
   const animated = animate && !reduced;
   return (
-    <div
-      onClick={onFlip}
-      className={`study-card flip-stage ${animated ? 'animate-flips' : ''} ${flipped ? 'is-flipped' : ''}`}
-    >
-      <div className="flip-rotor">
-        {(['front', 'back'] as const).map((side) => {
-          const active = (side === 'back') === flipped;
-          return (
-            <div
-              key={side}
-              ref={side === 'front' ? front : back}
-              className={`study-face study-${side}`}
-              role="button"
-              aria-label="Flip card"
-              aria-hidden={!active}
-              inert={!active}
-              tabIndex={active ? 0 : -1}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.repeat && !e.defaultPrevented) {
-                  e.preventDefault();
-                  onFlip();
-                }
-              }}
-            >
-              <span className="side-label">
-                {side === 'front' ? 'FRONT · QUESTION' : 'BACK · ANSWER'}
-              </span>
+    <div className="card-slot">
+      <div
+        onClick={onFlip}
+        className={`study-card flip-stage ${animated ? 'animate-flips' : ''} ${flipped ? 'is-flipped' : ''}`}
+      >
+        <div className="flip-rotor">
+          {(['front', 'back'] as const).map((side) => {
+            const active = (side === 'back') === flipped;
+            return (
               <div
-                className="study-scroll"
-                role="region"
-                aria-label="Card content"
+                key={side}
+                ref={side === 'front' ? front : back}
+                className={`study-face study-${side}`}
+                role="button"
+                aria-label="Flip card"
+                aria-hidden={!active}
+                inert={!active}
                 tabIndex={active ? 0 : -1}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.repeat && !e.defaultPrevented) {
+                    e.preventDefault();
+                    onFlip();
+                  }
+                }}
               >
-                <Content source={card[side]} />
+                <span className="side-label">
+                  {side === 'front' ? 'FRONT · QUESTION' : 'BACK · ANSWER'}
+                </span>
+                <div
+                  className="study-scroll"
+                  role="region"
+                  aria-label="Card content"
+                  tabIndex={active ? 0 : -1}
+                >
+                  <Content source={card[side]} />
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </div>
   );

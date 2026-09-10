@@ -58,9 +58,7 @@ test('Learn rounds, classification guards, math/images, keyboard isolation and o
     await page.getByRole('button', { name: 'Done', exact: true }).click();
     await page.getByRole('button', { name: 'Know it, Right arrow' }).click();
     await expect(page.getByRole('heading', { name: 'Round 1 complete' })).toBeVisible();
-    await expect(page.locator('.learn-summary')).toContainText(
-      '1 marked Know it this round · 1 still learning',
-    );
+    await expect(page.locator('.learn-summary')).toContainText('1 learned · 1 still learning');
     await page.getByRole('button', { name: 'Review remaining cards' }).click();
     await expect(page.locator('.study-progress')).toContainText('Round 2 · Card 1 of 1');
     await expect(page.locator('.study-front')).toContainText('Question');

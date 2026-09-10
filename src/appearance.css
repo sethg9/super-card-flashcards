@@ -503,3 +503,122 @@ main {
   max-width: 45%;
   overflow-wrap: anywhere;
 }
+/* Size the study workspace first, then distribute its remaining height to the card. */
+main.studying {
+  height: 100dvh;
+  min-height: 360px;
+  display: flex;
+  flex-direction: column;
+}
+.studying .study-view,
+.focus-view .study-view {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  max-width: none;
+  padding: clamp(16px, 2.2vw, 32px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.studying .study-heading,
+.studying .study-progress,
+.studying .progress-track,
+.studying .study-controls,
+.studying .learn-actions,
+.studying .learn-feedback {
+  flex-shrink: 0;
+  margin: 0;
+}
+.studying .study-heading {
+  min-height: 32px;
+}
+.studying .learn-feedback {
+  padding: 6px;
+  min-height: 28px;
+}
+.studying .learn-stage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+.card-slot {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  container-type: size;
+  display: grid;
+  place-items: center;
+  /* Projected 3D bounds must not enlarge the page's scrollable area. */
+  overflow: clip;
+  overflow-clip-margin: 6px;
+}
+.card-slot .flip-stage {
+  width: min(100%, 180cqh);
+  height: 100%;
+  margin: 0;
+  perspective: max(1400px, 400cqw);
+}
+.card-slot .flip-rotor {
+  height: 100%;
+  grid-template-rows: minmax(0, 1fr);
+}
+.card-slot .study-face {
+  min-height: 0;
+  height: 100%;
+  gap: 12px;
+  padding: clamp(12px, 3cqmin, 30px);
+  overflow: hidden;
+}
+.card-slot .study-face > .study-scroll {
+  min-height: 0;
+  max-height: none;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  overflow: auto;
+}
+.card-slot .study-face .card-content {
+  flex: 0 0 auto;
+  margin-block: auto;
+  overflow: visible;
+  font-size: clamp(
+    calc(var(--card-font-size, 25px) * 0.85),
+    calc(var(--card-font-size, 25px) + 0.25cqw + 0.6cqh - 5px),
+    calc(var(--card-font-size, 25px) * 1.2)
+  );
+}
+.card-slot .card-content h1 {
+  font-size: 1.7em;
+}
+.card-slot .card-content h2 {
+  font-size: 1.4em;
+}
+.card-slot .card-content h3 {
+  font-size: 1.2em;
+}
+.card-slot .card-content img {
+  max-width: 100%;
+  max-height: min(45cqh, 480px);
+  object-fit: contain;
+}
+.deck-name-field input {
+  font-size: inherit;
+  font-weight: 400;
+}
+@media (max-height: 650px) {
+  .studying .study-view {
+    gap: 8px;
+    padding: 16px;
+  }
+  .studying .learn-actions button {
+    padding: 8px 12px;
+  }
+  .studying .study-heading,
+  .studying .study-progress,
+  .studying .study-controls {
+    padding-block: 4px;
+  }
+}

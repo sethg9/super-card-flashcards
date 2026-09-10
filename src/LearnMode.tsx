@@ -97,7 +97,7 @@ export default function LearnMode({
             {session.remaining.length ? `Round ${session.round} complete` : 'You know every card!'}
           </h2>
           <p>
-            {session.known} marked Know it this round · {session.remaining.length} still learning
+            {session.known} learned · {session.remaining.length} still learning
           </p>
           {session.remaining.length > 0 ? (
             <button

@@ -182,6 +182,24 @@ export default function AppearanceDialog({
         </label>
       </section>
       <section className="appearance-section motion-setting">
+        <label className="field">
+          Card font size · {value.cardFontSize} px
+          <input
+            aria-label="Card font size"
+            type="range"
+            min="16"
+            max="36"
+            step="1"
+            value={value.cardFontSize}
+            onChange={(e) => update({ cardFontSize: Number(e.target.value) })}
+          />
+          <span className="muted">
+            Study and Learn text adapts gently to the available card area.
+          </span>
+        </label>
+        <button onClick={() => update({ cardFontSize: 25 })}>Reset card font size</button>
+      </section>
+      <section className="appearance-section motion-setting">
         <div>
           <h3>Card motion</h3>
           <p className="muted">
