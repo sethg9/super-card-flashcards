@@ -1,6 +1,6 @@
 # Super Card Flashcards
 
-An offline Windows flashcard app for studying at your own pace—with math, images, and no daily limits or due dates.
+An offline Windows flashcard app for studying at your own pace—with math, images, and no daily limits or due dates. Made to be a perfect offline Quizlet Alternative.
 
 **[Download for Windows](https://github.com/sethg9/super-card-flashcards/releases/latest)** · **[User guide and tutorials](https://github.com/sethg9/super-card-flashcards/wiki)**
 
